@@ -1,0 +1,108 @@
+/*--------GENERAL CSS--------*/
+
+:root {
+  /* background-color */
+  --bg-white: #ffffff;
+  --bg-blue: #060640;
+
+  /* text-color */
+  --primery-text: #060640;
+  --secondary-color: #00e5cc;
+  --text-gray: #828297;
+  --text-black: #000000;
+  --text-white: #ffffff;
+}
+
+body,
+html {
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+body {
+  margin: 0;
+}
+
+h1 {
+  color: var(--primery-text);
+  font-size: 5rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+h2 {
+  color: var(--primery-text);
+  font-size: 4.3rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 2rem;
+}
+
+h3 {
+  color: var(--primery-text);
+  font-size: 2.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h4 {
+  color: var(--text-black);
+  font-size: 2.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+h5 {
+  color: var(--text-bkack);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+h6 {
+  color: var(--bg-white);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+p {
+  color: var(--text-bkack);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a,
+a:hover,
+a:active,
+a:focus {
+  text-decoration: none;
+  outline: none;
+}
+
+li a {
+  color: var(--text-gray);
+}
+
+/*---------CSS FOR SIDE-NAV---------*/
+
+.listitems,
+.customText {
+  font-size: 1.3rem !important;
+  font-weight: 500 !important;
+}
