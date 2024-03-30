@@ -25,13 +25,14 @@ function Signup() {
   const [loading, setLoading] = useState(false);
 
   // -------Use-stste for error-handling-------
-  const [error, setError] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    cnic: "",
-    password: "",
-  });
+  const [error, setError] = useState();
+  //   {
+  //   firstName: "",
+  //   lastName: "",
+  //   email: "",
+  //   cnic: "",
+  //   password: "",
+  // }
 
   // -------Use-stste for revel-password-------
   const [RevealPassword, setRevealPassword] = useState(false);
@@ -68,19 +69,14 @@ function Signup() {
   // --------function for Error-Handling--------
   const errorHandling = (userinput) => {
     console.log(userinput.firstName);
-    let errorValue = {
-      firstName: false,
-      lastName: false,
-    };
+    let errorValue = {};
     let namePattern = /^[a-zA-Z]+$/;
     let EmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     let CnicPattern = /^\d{5}-\d{7}-\d$/;
     if (!namePattern.test(userinput.firstName)) {
-      errorValue.firstName = true;
-      // errorValue.firstName = "Please enter a character";
+      errorValue.firstName = "Please enter a character";
     } else if (!namePattern.test(userinput.lastName)) {
-      errorValue.lastName = true;
-      // errorValue.lastName = "Please enter a character vl";
+      errorValue.lastName = "Please enter a character value";
     } else if (!EmailPattern.test(userinput.email)) {
       errorValue.email = "Please enter a valid email";
     } else if (!CnicPattern.test(userinput.cnic)) {
@@ -124,8 +120,8 @@ function Signup() {
                       color="success"
                       InputProps={{ style: { fontSize: "1.5rem" } }}
                       InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                      error={error.firstName}
-                      helperText={error.firstName ? "1" : ""}
+                      error={error?.firstName}
+                      helperText={error?.firstName}
                       sx={{
                         "& .MuiFormHelperText-root": {
                           fontSize: "1rem",
@@ -145,8 +141,8 @@ function Signup() {
                       color="success"
                       InputProps={{ style: { fontSize: "1.5rem" } }}
                       InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                      error={error.lastName}
-                      helperText={error.lastName ? "2" : ""}
+                      error={error?.lastName}
+                      helperText={error?.lastName}
                       sx={{
                         "& .MuiFormHelperText-root": {
                           fontSize: "1rem",
@@ -167,8 +163,8 @@ function Signup() {
                       color="success"
                       InputProps={{ style: { fontSize: "1.5rem" } }}
                       InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                      error={error.email?.email}
-                      helperText={error.email?.email}
+                      error={error?.email}
+                      helperText={error?.email}
                       sx={{
                         "& .MuiFormHelperText-root": {
                           fontSize: "1rem",
@@ -188,8 +184,8 @@ function Signup() {
                       color="success"
                       InputProps={{ style: { fontSize: "1.5rem" } }}
                       InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                      error={error.cnic?.cnic}
-                      helperText={error.cnic?.cnic}
+                      error={error?.cnic}
+                      helperText={error?.cnic}
                       sx={{
                         "& .MuiFormHelperText-root": {
                           fontSize: "1rem",
@@ -210,8 +206,8 @@ function Signup() {
                         color="success"
                         InputProps={{ style: { fontSize: "1.5rem" } }}
                         InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                        error={error.password?.password}
-                        helperText={error.password?.password}
+                        error={error?.password}
+                        helperText={error?.password}
                         sx={{
                           "& .MuiFormHelperText-root": {
                             fontSize: "1rem",
