@@ -1,68 +1,94 @@
 import React, { useState } from "react";
 import birdlogo from "../assets/bird-logo.svg";
 import loginimg from "../assets/loginimg.png";
-import { Button, Container, Stack, TextField } from "@mui/material";
+import { Container, Stack, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
+import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import axios from "axios";
 
 function Signup() {
   const navigate = useNavigate();
 
   // -------use-state for user input-------
-  const [userinput, setUserinput] = useState([
-    {
-      firstName: "",
-      lastName: "",
-      email: "",
-      cnic: "",
-      password: "",
-    },
-  ]);
+  const [userinput, setUserinput] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    cnic: "",
+    password: "",
+  });
   // console.log(userinput);
 
   // -------use-state for handle-loading-------
   const [loading, setLoading] = useState(false);
 
   // -------Use-stste for error-handling-------
-  const [error, setError] = useState();
+  const [error, setError] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    cnic: "",
+    password: "",
+  });
+
+  // -------Use-stste for revel-password-------
+  const [RevealPassword, setRevealPassword] = useState(false);
 
   // -------function for input handeling-------
   const inputHandling = (e) => {
     const { name, value } = e.target;
     setUserinput({ ...userinput, [name]: value });
-    errorHandling(userinput);
+    errorHandling({ ...userinput, [name]: value });
   };
 
   // -------function for API calling-------
-  const fetchData = () => {
+  const fetchData = async () => {
     setLoading(true);
-    const apiCall = {
-      url: "http://localhost:8080/signup",
-      method: "POST",
-      data: userinput,
-    };
-    const apiResponse = axios(apiCall);
-    if (apiResponse.status === 200 || apiResponse.status === 201) {
-      console.log("Ustad g good ho gya ");
-      setLoading(false);
-    } else {
-      console.log("Very bad ustad g");
+    try {
+      const apiCall = {
+        url: "http://localhost:8080/signup",
+        method: "POST",
+        data: userinput,
+      };
+      const apiResponse = await axios(apiCall);
+      if (apiResponse.status === 200 || apiResponse.status === 201) {
+        console.log("Ustad g good ho gya ");
+        setLoading(false);
+      } else {
+        console.log("Very bad ustad g");
+      }
+    } catch (error) {
+      console.error("Error:", error.response.data.message);
     }
+    setLoading(false);
   };
 
   // --------function for Error-Handling--------
   const errorHandling = (userinput) => {
     console.log(userinput.firstName);
-    let errorValue = {};
+    let errorValue = {
+      firstName: false,
+      lastName: false,
+    };
     let namePattern = /^[a-zA-Z]+$/;
+    let EmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let CnicPattern = /^\d{5}-\d{7}-\d$/;
     if (!namePattern.test(userinput.firstName)) {
-      errorValue.firstName = "Please enter a character";
+      errorValue.firstName = true;
+      // errorValue.firstName = "Please enter a character";
+    } else if (!namePattern.test(userinput.lastName)) {
+      errorValue.lastName = true;
+      // errorValue.lastName = "Please enter a character vl";
+    } else if (!EmailPattern.test(userinput.email)) {
+      errorValue.email = "Please enter a valid email";
+    } else if (!CnicPattern.test(userinput.cnic)) {
+      errorValue.cnic = "Please enter a valid CNIC";
+    } else if (userinput.password.length < 8) {
+      errorValue.password =
+        "Your password must be greater than eight characters";
     }
-    // if (userinput.firstName.length < 5) {
-    //   errorValue.firstName = "Please enter a character";
-    // }
-
     setError(errorValue);
   };
 
@@ -96,8 +122,10 @@ function Signup() {
                       required
                       fullWidth
                       color="success"
-                      error={error?.firstName}
-                      helperText={error?.firstName}
+                      InputProps={{ style: { fontSize: "1.5rem" } }}
+                      InputLabelProps={{ style: { fontSize: "1.6rem" } }}
+                      error={error.firstName}
+                      helperText={error.firstName ? "1" : ""}
                       sx={{
                         "& .MuiFormHelperText-root": {
                           fontSize: "1rem",
@@ -105,8 +133,6 @@ function Signup() {
                           marginLeft: "0",
                         },
                       }}
-                      InputProps={{ style: { fontSize: "1.5rem" } }}
-                      InputLabelProps={{ style: { fontSize: "1.6rem" } }}
                     />
 
                     <TextField
@@ -119,6 +145,15 @@ function Signup() {
                       color="success"
                       InputProps={{ style: { fontSize: "1.5rem" } }}
                       InputLabelProps={{ style: { fontSize: "1.6rem" } }}
+                      error={error.lastName}
+                      helperText={error.lastName ? "2" : ""}
+                      sx={{
+                        "& .MuiFormHelperText-root": {
+                          fontSize: "1rem",
+                          fontWeight: "600",
+                          marginLeft: "0",
+                        },
+                      }}
                     />
 
                     <TextField
@@ -132,6 +167,15 @@ function Signup() {
                       color="success"
                       InputProps={{ style: { fontSize: "1.5rem" } }}
                       InputLabelProps={{ style: { fontSize: "1.6rem" } }}
+                      error={error.email?.email}
+                      helperText={error.email?.email}
+                      sx={{
+                        "& .MuiFormHelperText-root": {
+                          fontSize: "1rem",
+                          fontWeight: "600",
+                          marginLeft: "0",
+                        },
+                      }}
                     />
 
                     <TextField
@@ -144,19 +188,57 @@ function Signup() {
                       color="success"
                       InputProps={{ style: { fontSize: "1.5rem" } }}
                       InputLabelProps={{ style: { fontSize: "1.6rem" } }}
+                      error={error.cnic?.cnic}
+                      helperText={error.cnic?.cnic}
+                      sx={{
+                        "& .MuiFormHelperText-root": {
+                          fontSize: "1rem",
+                          fontWeight: "600",
+                          marginLeft: "0",
+                        },
+                      }}
                     />
 
-                    <TextField
-                      onChange={inputHandling}
-                      label="Password"
-                      placeholder="Enter your password"
-                      type="password"
-                      name="password"
-                      fullWidth
-                      color="success"
-                      InputProps={{ style: { fontSize: "1.5rem" } }}
-                      InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                    />
+                    <div className="sign-up-password">
+                      <TextField
+                        onChange={inputHandling}
+                        label="Password"
+                        placeholder="Enter your password"
+                        type={RevealPassword ? "text" : "password"}
+                        name="password"
+                        fullWidth
+                        color="success"
+                        InputProps={{ style: { fontSize: "1.5rem" } }}
+                        InputLabelProps={{ style: { fontSize: "1.6rem" } }}
+                        error={error.password?.password}
+                        helperText={error.password?.password}
+                        sx={{
+                          "& .MuiFormHelperText-root": {
+                            fontSize: "1rem",
+                            fontWeight: "600",
+                            marginLeft: "0",
+                          },
+                        }}
+                      />
+                      <div className="password-reveal-icon">
+                        {RevealPassword === true && (
+                          <VisibilityIcon
+                            sx={{ fontSize: "2rem", cursor: "pointer" }}
+                            onClick={() => {
+                              setRevealPassword(false);
+                            }}
+                          />
+                        )}
+                        {RevealPassword === false && (
+                          <VisibilityOffRoundedIcon
+                            onClick={() => {
+                              setRevealPassword(true);
+                            }}
+                            sx={{ fontSize: "2rem", cursor: "pointer" }}
+                          />
+                        )}
+                      </div>
+                    </div>
                   </Stack>
                 </div>
                 <div className="forget-password mt-4 mb-4">

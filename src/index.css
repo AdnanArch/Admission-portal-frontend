@@ -99,10 +99,17 @@ li a {
   color: var(--text-gray);
 }
 
-/*---------CSS FOR SIDE-NAV---------*/
-
 .listitems,
 .customText {
   font-size: 1.3rem !important;
   font-weight: 500 !important;
+}
+/*--------CSS FOR SIGN-UP PAGE---------*/
+.sign-up-password {
+  position: relative;
+}
+.password-reveal-icon {
+  position: absolute;
+  right: 1rem;
+  top: 2rem;
 }
