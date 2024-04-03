@@ -113,3 +113,11 @@ li a {
   right: 1rem;
   top: 2rem;
 }
+.e-mail-verification-code {
+  position: relative;
+}
+.e-mail-verification-get-code {
+  position: absolute;
+  right: 1rem;
+  top: 1.2rem;
+}

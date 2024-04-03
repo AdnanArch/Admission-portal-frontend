@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import birdlogo from "../assets/bird-logo.svg";
 import loginimg from "../assets/loginimg.png";
-import { Container, Stack, TextField } from "@mui/material";
+import { Button, Container, Stack, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
 import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
@@ -19,23 +19,25 @@ function Signup() {
     cnic: "",
     password: "",
   });
-  // console.log(userinput);
 
   // -------use-state for handle-loading-------
   const [loading, setLoading] = useState(false);
 
   // -------Use-stste for error-handling-------
-  const [error, setError] = useState();
-  //   {
-  //   firstName: "",
-  //   lastName: "",
-  //   email: "",
-  //   cnic: "",
-  //   password: "",
-  // }
+  const [error, setError] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    cnic: "",
+    password: "",
+  });
 
   // -------Use-stste for revel-password-------
   const [RevealPassword, setRevealPassword] = useState(false);
+
+  // ---------Use-state for 60s-countdown---------
+  const [seconds, setSeconds] = useState(60);
+  const [timerRunning, setTimerRunning] = useState(false);
 
   // -------function for input handeling-------
   const inputHandling = (e) => {
@@ -73,19 +75,57 @@ function Signup() {
     let namePattern = /^[a-zA-Z]+$/;
     let EmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     let CnicPattern = /^\d{5}-\d{7}-\d$/;
-    if (!namePattern.test(userinput.firstName)) {
+    // let CnicNumericPattern = /^[0-9\-]+$/;
+    if (
+      userinput.firstName.length > 0 &&
+      !namePattern.test(userinput.firstName)
+    ) {
       errorValue.firstName = "Please enter a character";
-    } else if (!namePattern.test(userinput.lastName)) {
+    } else if (
+      userinput.lastName.length > 0 &&
+      !namePattern.test(userinput.lastName)
+    ) {
       errorValue.lastName = "Please enter a character value";
-    } else if (!EmailPattern.test(userinput.email)) {
-      errorValue.email = "Please enter a valid email";
-    } else if (!CnicPattern.test(userinput.cnic)) {
-      errorValue.cnic = "Please enter a valid CNIC";
-    } else if (userinput.password.length < 8) {
+    } else if (
+      userinput.email.length > 0 &&
+      !EmailPattern.test(userinput.email)
+    ) {
+      errorValue.email = "Please enter a valid email addess";
+    } else if (userinput.cnic.length > 0 && !CnicPattern.test(userinput.cnic)) {
+      errorValue.cnic = "Please enter a valid CNIC number";
+    } else if (userinput.password.length > 0 && userinput.password.length < 8) {
       errorValue.password =
         "Your password must be greater than eight characters";
     }
     setError(errorValue);
+  };
+
+  // ---------Function for 60s-countdoen---------
+  useEffect(() => {
+    let intervalId;
+    if (timerRunning) {
+      intervalId = setInterval(() => {
+        setSeconds((prevSeconds) => {
+          if (prevSeconds === 0) {
+            clearInterval(intervalId); // Stop the interval when countdown reaches zero
+            setTimerRunning(false); // Stop the timer
+            return 60;
+          }
+          return prevSeconds - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(intervalId);
+  }, [timerRunning]);
+
+  const startTimer = () => {
+    setSeconds(60);
+    setTimerRunning(true);
+  };
+
+  const formatTime = (time) => {
+    return time < 10 ? `0${time}` : time;
   };
 
   return (
@@ -104,8 +144,7 @@ function Signup() {
               </div>
               <div className="login-content mx-auto" style={{ width: "35rem" }}>
                 <div className="login-head mb-5">
-                  <h5 className="mb-4">Get started with a Forever Free plan</h5>
-                  <p>Signup in seconds. No credit card required.</p>
+                  <h5 className="mb-4 text-center">Sign up</h5>
                 </div>
                 <div className="login-text-field">
                   <Stack spacing={2}>
@@ -120,7 +159,7 @@ function Signup() {
                       color="success"
                       InputProps={{ style: { fontSize: "1.5rem" } }}
                       InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                      error={error?.firstName}
+                      error={error.firstName}
                       helperText={error?.firstName}
                       sx={{
                         "& .MuiFormHelperText-root": {
@@ -134,14 +173,14 @@ function Signup() {
                     <TextField
                       onChange={inputHandling}
                       label="Last Name"
-                      placeholder="Enter your Last Nmae"
+                      placeholder="Enter Last Name"
                       type="text"
                       name="lastName"
                       fullWidth
                       color="success"
                       InputProps={{ style: { fontSize: "1.5rem" } }}
                       InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                      error={error?.lastName}
+                      error={error.lastName}
                       helperText={error?.lastName}
                       sx={{
                         "& .MuiFormHelperText-root": {
@@ -155,7 +194,7 @@ function Signup() {
                     <TextField
                       onChange={inputHandling}
                       label="E-mail"
-                      placeholder="Enter e-mail"
+                      placeholder="Enter E-mail"
                       type="email"
                       name="email"
                       required
@@ -199,7 +238,7 @@ function Signup() {
                       <TextField
                         onChange={inputHandling}
                         label="Password"
-                        placeholder="Enter your password"
+                        placeholder="Enter Your Password"
                         type={RevealPassword ? "text" : "password"}
                         name="password"
                         fullWidth
@@ -232,6 +271,55 @@ function Signup() {
                             }}
                             sx={{ fontSize: "2rem", cursor: "pointer" }}
                           />
+                        )}
+                      </div>
+                    </div>
+                    <div className="e-mail-verification-code">
+                      <TextField
+                        label="Verification Code"
+                        placeholder="0 0 0 0 0 0"
+                        type="text"
+                        name="cnic"
+                        fullWidth
+                        color="success"
+                        InputProps={{ style: { fontSize: "1.5rem" } }}
+                        InputLabelProps={{ style: { fontSize: "1.6rem" } }}
+                        // error={error?.cnic}
+                        // helperText={error?.cnic}
+                        // sx={{
+                        //   "& .MuiFormHelperText-root": {
+                        //     fontSize: "1rem",
+                        //     fontWeight: "600",
+                        //     marginLeft: "0",
+                        //   },
+                        // }}
+                      />
+                      <div className="e-mail-verification-get-code">
+                        {timerRunning === false && (
+                          <Button
+                            onClick={startTimer}
+                            sx={{
+                              textTransform: "none",
+                              fontSize: "1.2rem",
+                              fontWeight: "600",
+                            }}
+                          >
+                            Obtain Code
+                          </Button>
+                        )}
+
+                        {timerRunning === true && (
+                          <Button
+                            sx={{
+                              textTransform: "none",
+                              fontSize: "1.2rem",
+                              fontWeight: "600",
+                            }}
+                          >
+                            {" "}
+                            {formatTime(Math.floor(seconds / 60))}:
+                            {formatTime(seconds % 60)}
+                          </Button>
                         )}
                       </div>
                     </div>
