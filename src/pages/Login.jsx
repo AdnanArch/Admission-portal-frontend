@@ -95,7 +95,7 @@ function Login() {
                     }}
                     style={{ cursor: "pointer" }}
                   >
-                    Don't have an account at?{" "}
+                    Don&apos;t have an account at?{" "}
                     <span style={{ color: "#04A56A", fontWeight: "600" }}>
                       Sign up
                     </span>
