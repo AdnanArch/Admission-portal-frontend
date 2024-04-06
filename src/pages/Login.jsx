@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import birdlogo from "../assets/bird-logo.svg";
 import loginimg from "../assets/loginimg.png";
-import { Container, Stack, TextField } from "@mui/material";
+import { Button, Container, Stack, TextField } from "@mui/material";
 import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useNavigate } from "react-router-dom";
@@ -73,35 +73,43 @@ function Login() {
   return (
     <>
       <section className="login-section" style={{ overflow: "hidden" }}>
-        <div className="row">
+        <div className="row" style={{ height: "100vh" }}>
           <div className="col-lg-7 col-md-12 col-sm-12  mt-5 mb-5">
             <Container>
-              <div className="logo">
-                <img
-                  src={birdlogo}
-                  alt="Bird-logo"
-                  className="img-fluid"
-                  style={{ width: "13rem" }}
-                />
+              <div className="d-flex justify-content-between align-items-center">
+                <div className="logo">
+                  <img
+                    src={birdlogo}
+                    alt="Bird-logo"
+                    className="img-fluid"
+                    style={{ width: "13rem" }}
+                  />
+                </div>
+                <div>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      navigate("/adminlogin");
+                    }}
+                    color="success"
+                    size="medium"
+                    sx={{
+                      color: "#04A56A",
+                      textTransform: "none",
+                      fontWeight: "600",
+                      fontSize: "1.3rem",
+                    }}
+                  >
+                    Admin Login
+                  </Button>
+                </div>
               </div>
               <div className="login-content mx-auto" style={{ width: "35rem" }}>
                 <div className="login-head mb-5">
-                  <h5 className="mb-4">
-                    Sign in to your Mailclub <br /> account
-                  </h5>
-                  <p
-                    onClick={() => {
-                      navigate("/signup");
-                    }}
-                    style={{ cursor: "pointer" }}
-                  >
-                    Don&apos;t have an account at?{" "}
-                    <span style={{ color: "#04A56A", fontWeight: "600" }}>
-                      Sign up
-                    </span>
-                  </p>
+                  <h5>Sign in</h5>
+                  <p>Are you Admin? </p>
                 </div>
-                <div className="login-text-field">
+                <div className="login-text-field mb-5">
                   <Stack spacing={3}>
                     <TextField
                       onChange={InputHandeling}
@@ -154,13 +162,29 @@ function Login() {
                         )}
                       </div>
                     </div>
+                    <div className="forget-password mt-4">
+                      <p style={{ color: "#04A56A", textAlign: "end" }}>
+                        Forgot password?
+                      </p>
+                    </div>
+                    <p className="mt-0">
+                      Don&apos;t have an account at?{" "}
+                      <span
+                        style={{
+                          color: "#04A56A",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => {
+                          navigate("/signup");
+                        }}
+                      >
+                        Sign up
+                      </span>
+                    </p>
                   </Stack>
                 </div>
-                <div className="forget-password mt-4 mb-4">
-                  <p style={{ color: "#04A56A", textAlign: "end" }}>
-                    Forgot your password?
-                  </p>
-                </div>
+
                 <div className="sign-in-button">
                   <LoadingButton
                     onClick={() => {

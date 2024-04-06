@@ -121,3 +121,36 @@ li a {
   right: 1rem;
   top: 1.2rem;
 }
+
+/*-------- CSS FOR TWO STEP VERIFICATION ----------*/
+.two-step-verification {
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  align-items: center;
+}
+.verification-wrapper {
+  width: 60rem;
+}
+.two-step-verification .verification-content {
+  padding: 2rem;
+}
+
+.two-step-verification .verification-content .input-box input {
+  width: 7.5rem;
+  height: 4.5rem;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: 1px solid var(--text-gray);
+}
+.two-step-verification .verification-content .input-box input::placeholder {
+  font-weight: normal;
+}
+.two-step-verification .verification-content .input-box input:focus {
+  outline: 2px solid #1976d2;
+}
+.two-step-verification .bottom-buttons .forgot-pass {
+  color: #1976d2;
+}

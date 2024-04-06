@@ -58,7 +58,7 @@ function Sidenav(props) {
           <ListItemButton
             selected={active}
             onClick={() => {
-              navigate("/");
+              navigate("/dashboard");
               handleActive();
             }}
           >

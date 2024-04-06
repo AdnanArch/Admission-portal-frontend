@@ -1,15 +1,83 @@
 import React, { useEffect, useState } from "react";
 import birdlogo from "../assets/bird-logo.svg";
 import loginimg from "../assets/loginimg.png";
-import { Button, Container, Stack, TextField } from "@mui/material";
+import {
+  Backdrop,
+  Box,
+  Modal,
+  Container,
+  Stack,
+  TextField,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
-import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import axios from "axios";
+import PropTypes from "prop-types";
+import Typography from "@mui/material/Typography";
+import { useSpring, animated } from "@react-spring/web";
+import successIcon from "../assets/success-icon.svg";
+
+const Fade = React.forwardRef(function Fade(props, ref) {
+  const {
+    children,
+    in: open,
+    onClick,
+    onEnter,
+    onExited,
+    ownerState,
+    ...other
+  } = props;
+  const style = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: open ? 1 : 0 },
+    onStart: () => {
+      if (open && onEnter) {
+        onEnter(null, true);
+      }
+    },
+    onRest: () => {
+      if (!open && onExited) {
+        onExited(null, true);
+      }
+    },
+  });
+
+  return (
+    <animated.div ref={ref} style={style} {...other}>
+      {React.cloneElement(children, { onClick })}
+    </animated.div>
+  );
+});
+
+Fade.propTypes = {
+  children: PropTypes.element.isRequired,
+  in: PropTypes.bool,
+  onClick: PropTypes.any,
+  onEnter: PropTypes.func,
+  onExited: PropTypes.func,
+  ownerState: PropTypes.any,
+};
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #04A56A",
+  boxShadow: 24,
+  p: 4,
+};
 
 function Signup() {
   const navigate = useNavigate();
+
+  // ----------use state for model----------
+  const [open, setOpen] = React.useState(false);
+  const handleClose = () => setOpen(false);
 
   // -------use-state for user input-------
   const [userinput, setUserinput] = useState({
@@ -35,10 +103,6 @@ function Signup() {
   // -------Use-stste for revel-password-------
   const [RevealPassword, setRevealPassword] = useState(false);
 
-  // ---------Use-state for 60s-countdown---------
-  const [seconds, setSeconds] = useState(60);
-  const [timerRunning, setTimerRunning] = useState(false);
-
   // -------function for input handeling-------
   const inputHandling = (e) => {
     const { name, value } = e.target;
@@ -57,8 +121,9 @@ function Signup() {
       };
       const apiResponse = await axios(apiCall);
       if (apiResponse.status === 200 || apiResponse.status === 201) {
-        console.log("Ustad g good ho gya ");
+        setOpen(true);
         setLoading(false);
+        navigate("/signup/verification");
       } else {
         console.log("Very bad ustad g");
       }
@@ -75,7 +140,6 @@ function Signup() {
     let namePattern = /^[a-zA-Z]+$/;
     let EmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     let CnicPattern = /^\d{5}-\d{7}-\d$/;
-    // let CnicNumericPattern = /^[0-9\-]+$/;
     if (
       userinput.firstName.length > 0 &&
       !namePattern.test(userinput.firstName)
@@ -100,38 +164,10 @@ function Signup() {
     setError(errorValue);
   };
 
-  // ---------Function for 60s-countdoen---------
-  useEffect(() => {
-    let intervalId;
-    if (timerRunning) {
-      intervalId = setInterval(() => {
-        setSeconds((prevSeconds) => {
-          if (prevSeconds === 0) {
-            clearInterval(intervalId); // Stop the interval when countdown reaches zero
-            setTimerRunning(false); // Stop the timer
-            return 60;
-          }
-          return prevSeconds - 1;
-        });
-      }, 1000);
-    }
-
-    return () => clearInterval(intervalId);
-  }, [timerRunning]);
-
-  const startTimer = () => {
-    setSeconds(60);
-    setTimerRunning(true);
-  };
-
-  const formatTime = (time) => {
-    return time < 10 ? `0${time}` : time;
-  };
-
   return (
     <>
       <section className="login-section" style={{ overflow: "hidden" }}>
-        <div className="row" style={{ height: "" }}>
+        <div className="row" style={{ height: "100vh" }}>
           <div className="col-lg-7 col-md-12 col-sm-12 mb-5">
             <Container>
               <div className="logo">
@@ -257,7 +293,7 @@ function Signup() {
                       />
                       <div className="password-reveal-icon">
                         {RevealPassword === true && (
-                          <VisibilityIcon
+                          <RemoveRedEyeOutlinedIcon
                             sx={{ fontSize: "2rem", cursor: "pointer" }}
                             onClick={() => {
                               setRevealPassword(false);
@@ -265,61 +301,12 @@ function Signup() {
                           />
                         )}
                         {RevealPassword === false && (
-                          <VisibilityOffRoundedIcon
+                          <VisibilityOffOutlinedIcon
                             onClick={() => {
                               setRevealPassword(true);
                             }}
                             sx={{ fontSize: "2rem", cursor: "pointer" }}
                           />
-                        )}
-                      </div>
-                    </div>
-                    <div className="e-mail-verification-code">
-                      <TextField
-                        label="Verification Code"
-                        placeholder="0 0 0 0 0 0"
-                        type="text"
-                        name="cnic"
-                        fullWidth
-                        color="success"
-                        InputProps={{ style: { fontSize: "1.5rem" } }}
-                        InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                        // error={error?.cnic}
-                        // helperText={error?.cnic}
-                        // sx={{
-                        //   "& .MuiFormHelperText-root": {
-                        //     fontSize: "1rem",
-                        //     fontWeight: "600",
-                        //     marginLeft: "0",
-                        //   },
-                        // }}
-                      />
-                      <div className="e-mail-verification-get-code">
-                        {timerRunning === false && (
-                          <Button
-                            onClick={startTimer}
-                            sx={{
-                              textTransform: "none",
-                              fontSize: "1.2rem",
-                              fontWeight: "600",
-                            }}
-                          >
-                            Obtain Code
-                          </Button>
-                        )}
-
-                        {timerRunning === true && (
-                          <Button
-                            sx={{
-                              textTransform: "none",
-                              fontSize: "1.2rem",
-                              fontWeight: "600",
-                            }}
-                          >
-                            {" "}
-                            {formatTime(Math.floor(seconds / 60))}:
-                            {formatTime(seconds % 60)}
-                          </Button>
                         )}
                       </div>
                     </div>
@@ -366,6 +353,42 @@ function Signup() {
           >
             <img src={loginimg} alt="Login-img" className="img-fluid" />
           </div>
+        </div>
+
+        <div>
+          {/* <Button onClick={handleOpen}>Open modal</Button> */}
+          <Modal
+            aria-labelledby="spring-modal-title"
+            aria-describedby="spring-modal-description"
+            open={open}
+            onClose={handleClose}
+            closeAfterTransition
+            slots={{ backdrop: Backdrop }}
+            slotProps={{
+              backdrop: {
+                TransitionComponent: Fade,
+              },
+            }}
+          >
+            <Fade in={open}>
+              <Box sx={style}>
+                <div className="d-flex align-items-center justify-content-center">
+                  <h5>Register Successfully</h5>
+                  <img
+                    src={successIcon}
+                    alt="success-icon"
+                    className="img-fluid ms-2"
+                    style={{ width: "3.5rem" }}
+                  />
+                </div>
+                <Typography
+                  id="spring-modal-title"
+                  variant="h6"
+                  component="h2"
+                ></Typography>
+              </Box>
+            </Fade>
+          </Modal>
         </div>
       </section>
     </>
