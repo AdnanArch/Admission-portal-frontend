@@ -1,15 +1,83 @@
 import React, { useEffect, useState } from "react";
 import birdlogo from "../assets/bird-logo.svg";
 import loginimg from "../assets/loginimg.png";
-import { Button, Container, Stack, TextField } from "@mui/material";
+import {
+  Backdrop,
+  Box,
+  Modal,
+  Container,
+  Stack,
+  TextField,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
-import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import axios from "axios";
+import PropTypes from "prop-types";
+import Typography from "@mui/material/Typography";
+import { useSpring, animated } from "@react-spring/web";
+import successIcon from "../assets/success-icon.svg";
+
+const Fade = React.forwardRef(function Fade(props, ref) {
+  const {
+    children,
+    in: open,
+    onClick,
+    onEnter,
+    onExited,
+    ownerState,
+    ...other
+  } = props;
+  const style = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: open ? 1 : 0 },
+    onStart: () => {
+      if (open && onEnter) {
+        onEnter(null, true);
+      }
+    },
+    onRest: () => {
+      if (!open && onExited) {
+        onExited(null, true);
+      }
+    },
+  });
+
+  return (
+    <animated.div ref={ref} style={style} {...other}>
+      {React.cloneElement(children, { onClick })}
+    </animated.div>
+  );
+});
+
+Fade.propTypes = {
+  children: PropTypes.element.isRequired,
+  in: PropTypes.bool,
+  onClick: PropTypes.any,
+  onEnter: PropTypes.func,
+  onExited: PropTypes.func,
+  ownerState: PropTypes.any,
+};
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #04A56A",
+  boxShadow: 24,
+  p: 4,
+};
 
 function Signup() {
   const navigate = useNavigate();
+
+  // ----------use state for model----------
+  const [open, setOpen] = React.useState(false);
+  const handleClose = () => setOpen(false);
 
   // -------use-state for user input-------
   const [userinput, setUserinput] = useState({
@@ -35,15 +103,11 @@ function Signup() {
   // -------Use-stste for revel-password-------
   const [RevealPassword, setRevealPassword] = useState(false);
 
-  // ---------Use-state for 60s-countdown---------
-  const [seconds, setSeconds] = useState(60);
-  const [timerRunning, setTimerRunning] = useState(false);
-
   // -------function for input handeling-------
   const inputHandling = (e) => {
     const { name, value } = e.target;
     setUserinput({ ...userinput, [name]: value });
-    errorHandling({ ...userinput, [name]: value });
+    ErrorHandling({ ...userinput, [name]: value });
   };
 
   // -------function for API calling-------
@@ -57,8 +121,9 @@ function Signup() {
       };
       const apiResponse = await axios(apiCall);
       if (apiResponse.status === 200 || apiResponse.status === 201) {
-        console.log("Ustad g good ho gya ");
+        setOpen(true);
         setLoading(false);
+        navigate("/signup/verification");
       } else {
         console.log("Very bad ustad g");
       }
@@ -69,184 +134,110 @@ function Signup() {
   };
 
   // --------function for Error-Handling--------
-  const errorHandling = (userinput) => {
+  const ErrorHandling = (userinput) => {
     console.log(userinput.firstName);
     let errorValue = {};
     let namePattern = /^[a-zA-Z]+$/;
     let EmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     let CnicPattern = /^\d{5}-\d{7}-\d$/;
-    // let CnicNumericPattern = /^[0-9\-]+$/;
     if (
       userinput.firstName.length > 0 &&
       !namePattern.test(userinput.firstName)
     ) {
       errorValue.firstName = "Please enter a character";
+      return setError(errorValue);
     } else if (
       userinput.lastName.length > 0 &&
       !namePattern.test(userinput.lastName)
     ) {
       errorValue.lastName = "Please enter a character value";
+      return setError(errorValue);
     } else if (
       userinput.email.length > 0 &&
       !EmailPattern.test(userinput.email)
     ) {
       errorValue.email = "Please enter a valid email addess";
+      return setError(errorValue);
     } else if (userinput.cnic.length > 0 && !CnicPattern.test(userinput.cnic)) {
       errorValue.cnic = "Please enter a valid CNIC number";
+      return setError(errorValue);
     } else if (userinput.password.length > 0 && userinput.password.length < 8) {
       errorValue.password =
         "Your password must be greater than eight characters";
+      return setError(errorValue);
     }
-    setError(errorValue);
+    setError("");
   };
 
-  // ---------Function for 60s-countdoen---------
-  useEffect(() => {
-    let intervalId;
-    if (timerRunning) {
-      intervalId = setInterval(() => {
-        setSeconds((prevSeconds) => {
-          if (prevSeconds === 0) {
-            clearInterval(intervalId); // Stop the interval when countdown reaches zero
-            setTimerRunning(false); // Stop the timer
-            return 60;
-          }
-          return prevSeconds - 1;
-        });
-      }, 1000);
+  // -------function for error chrk on submit-------
+  const ErrorOnSubmitForm = (userinput) => {
+    console.log("wahab");
+    console.log(userinput.firstName);
+    let ErrorMessage = {};
+    let EmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let CnicPattern = /^\d{5}-\d{7}-\d$/;
+    if (userinput.firstName.length < 1) {
+      ErrorMessage.firstName = "Please enter first name";
+      return setError(ErrorMessage);
+    } else if (userinput.lastName.length < 1) {
+      ErrorMessage.lastName = "Please enter last name";
+      return setError(ErrorMessage);
+    } else if (!EmailPattern.test(userinput.email)) {
+      ErrorMessage.email = "Please enter valid email address";
+      return setError(ErrorMessage);
+    } else if (!CnicPattern.test(userinput.cnic)) {
+      ErrorMessage.cnic = "Please enter a valid CNIC number";
+      return setError(ErrorMessage);
+    } else if (userinput.password.length < 1) {
+      ErrorMessage.password = "Please enter a password";
+      return setError(ErrorMessage);
     }
-
-    return () => clearInterval(intervalId);
-  }, [timerRunning]);
-
-  const startTimer = () => {
-    setSeconds(60);
-    setTimerRunning(true);
+    setError("");
+    fetchData();
   };
 
-  const formatTime = (time) => {
-    return time < 10 ? `0${time}` : time;
+  // --------function for submit button--------
+  const SubmitAllFunction = () => {
+    ErrorOnSubmitForm(userinput);
   };
 
   return (
     <>
       <section className="login-section" style={{ overflow: "hidden" }}>
-        <div className="row" style={{ height: "" }}>
-          <div className="col-lg-7 col-md-12 col-sm-12 mb-5">
-            <Container>
-              <div className="logo">
-                <img
-                  src={birdlogo}
-                  alt="Bird-logo"
-                  className="img-fluid"
-                  style={{ width: "13rem" }}
-                />
-              </div>
-              <div className="login-content mx-auto" style={{ width: "35rem" }}>
-                <div className="login-head mb-5">
-                  <h5 className="mb-4 text-center">Sign up</h5>
+        <form>
+          <div className="row" style={{ height: "100vh" }}>
+            <div className="col-lg-7 col-md-12 col-sm-12 mb-5">
+              <Container>
+                <div className="logo">
+                  <img
+                    src={birdlogo}
+                    alt="Bird-logo"
+                    className="img-fluid"
+                    style={{ width: "13rem" }}
+                  />
                 </div>
-                <div className="login-text-field">
-                  <Stack spacing={2}>
-                    <TextField
-                      onChange={inputHandling}
-                      label="First Name"
-                      placeholder="Enter First Name"
-                      type="text"
-                      name="firstName"
-                      required
-                      fullWidth
-                      color="success"
-                      InputProps={{ style: { fontSize: "1.5rem" } }}
-                      InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                      error={error.firstName}
-                      helperText={error?.firstName}
-                      sx={{
-                        "& .MuiFormHelperText-root": {
-                          fontSize: "1rem",
-                          fontWeight: "600",
-                          marginLeft: "0",
-                        },
-                      }}
-                    />
-
-                    <TextField
-                      onChange={inputHandling}
-                      label="Last Name"
-                      placeholder="Enter Last Name"
-                      type="text"
-                      name="lastName"
-                      fullWidth
-                      color="success"
-                      InputProps={{ style: { fontSize: "1.5rem" } }}
-                      InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                      error={error.lastName}
-                      helperText={error?.lastName}
-                      sx={{
-                        "& .MuiFormHelperText-root": {
-                          fontSize: "1rem",
-                          fontWeight: "600",
-                          marginLeft: "0",
-                        },
-                      }}
-                    />
-
-                    <TextField
-                      onChange={inputHandling}
-                      label="E-mail"
-                      placeholder="Enter E-mail"
-                      type="email"
-                      name="email"
-                      required
-                      fullWidth
-                      color="success"
-                      InputProps={{ style: { fontSize: "1.5rem" } }}
-                      InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                      error={error?.email}
-                      helperText={error?.email}
-                      sx={{
-                        "& .MuiFormHelperText-root": {
-                          fontSize: "1rem",
-                          fontWeight: "600",
-                          marginLeft: "0",
-                        },
-                      }}
-                    />
-
-                    <TextField
-                      onChange={inputHandling}
-                      label="CNIC"
-                      placeholder="Enter CNIC "
-                      type="text"
-                      name="cnic"
-                      fullWidth
-                      color="success"
-                      InputProps={{ style: { fontSize: "1.5rem" } }}
-                      InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                      error={error?.cnic}
-                      helperText={error?.cnic}
-                      sx={{
-                        "& .MuiFormHelperText-root": {
-                          fontSize: "1rem",
-                          fontWeight: "600",
-                          marginLeft: "0",
-                        },
-                      }}
-                    />
-
-                    <div className="sign-up-password">
+                <div
+                  className="login-content mx-auto"
+                  style={{ width: "35rem" }}
+                >
+                  <div className="login-head mb-5">
+                    <h5 className="mb-4 text-center">Sign up</h5>
+                  </div>
+                  <div className="login-text-field">
+                    <Stack spacing={2}>
                       <TextField
                         onChange={inputHandling}
-                        label="Password"
-                        placeholder="Enter Your Password"
-                        type={RevealPassword ? "text" : "password"}
-                        name="password"
+                        label="First Name"
+                        placeholder="Enter First Name"
+                        type="text"
+                        name="firstName"
+                        required
                         fullWidth
                         color="success"
                         InputProps={{ style: { fontSize: "1.5rem" } }}
                         InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                        error={error?.password}
-                        helperText={error?.password}
+                        error={error.firstName}
+                        helperText={error.firstName}
                         sx={{
                           "& .MuiFormHelperText-root": {
                             fontSize: "1rem",
@@ -255,118 +246,192 @@ function Signup() {
                           },
                         }}
                       />
-                      <div className="password-reveal-icon">
-                        {RevealPassword === true && (
-                          <VisibilityIcon
-                            sx={{ fontSize: "2rem", cursor: "pointer" }}
-                            onClick={() => {
-                              setRevealPassword(false);
-                            }}
-                          />
-                        )}
-                        {RevealPassword === false && (
-                          <VisibilityOffRoundedIcon
-                            onClick={() => {
-                              setRevealPassword(true);
-                            }}
-                            sx={{ fontSize: "2rem", cursor: "pointer" }}
-                          />
-                        )}
-                      </div>
-                    </div>
-                    <div className="e-mail-verification-code">
+
                       <TextField
-                        label="Verification Code"
-                        placeholder="0 0 0 0 0 0"
+                        onChange={inputHandling}
+                        label="Last Name"
+                        placeholder="Enter Last Name"
+                        type="text"
+                        name="lastName"
+                        fullWidth
+                        color="success"
+                        InputProps={{ style: { fontSize: "1.5rem" } }}
+                        InputLabelProps={{ style: { fontSize: "1.6rem" } }}
+                        error={error.lastName}
+                        helperText={error.lastName}
+                        sx={{
+                          "& .MuiFormHelperText-root": {
+                            fontSize: "1rem",
+                            fontWeight: "600",
+                            marginLeft: "0",
+                          },
+                        }}
+                      />
+
+                      <TextField
+                        onChange={inputHandling}
+                        label="E-mail"
+                        placeholder="Enter E-mail"
+                        type="email"
+                        name="email"
+                        required
+                        fullWidth
+                        color="success"
+                        InputProps={{ style: { fontSize: "1.5rem" } }}
+                        InputLabelProps={{ style: { fontSize: "1.6rem" } }}
+                        error={error?.email}
+                        helperText={error?.email}
+                        sx={{
+                          "& .MuiFormHelperText-root": {
+                            fontSize: "1rem",
+                            fontWeight: "600",
+                            marginLeft: "0",
+                          },
+                        }}
+                      />
+
+                      <TextField
+                        onChange={inputHandling}
+                        label="CNIC"
+                        placeholder="Enter CNIC "
                         type="text"
                         name="cnic"
                         fullWidth
                         color="success"
                         InputProps={{ style: { fontSize: "1.5rem" } }}
                         InputLabelProps={{ style: { fontSize: "1.6rem" } }}
-                        // error={error?.cnic}
-                        // helperText={error?.cnic}
-                        // sx={{
-                        //   "& .MuiFormHelperText-root": {
-                        //     fontSize: "1rem",
-                        //     fontWeight: "600",
-                        //     marginLeft: "0",
-                        //   },
-                        // }}
+                        error={error?.cnic}
+                        helperText={error?.cnic}
+                        sx={{
+                          "& .MuiFormHelperText-root": {
+                            fontSize: "1rem",
+                            fontWeight: "600",
+                            marginLeft: "0",
+                          },
+                        }}
                       />
-                      <div className="e-mail-verification-get-code">
-                        {timerRunning === false && (
-                          <Button
-                            onClick={startTimer}
-                            sx={{
-                              textTransform: "none",
-                              fontSize: "1.2rem",
-                              fontWeight: "600",
-                            }}
-                          >
-                            Obtain Code
-                          </Button>
-                        )}
 
-                        {timerRunning === true && (
-                          <Button
-                            sx={{
-                              textTransform: "none",
-                              fontSize: "1.2rem",
+                      <div className="sign-up-password">
+                        <TextField
+                          onChange={inputHandling}
+                          label="Password"
+                          placeholder="Enter Your Password"
+                          type={RevealPassword ? "text" : "password"}
+                          name="password"
+                          fullWidth
+                          color="success"
+                          InputProps={{ style: { fontSize: "1.5rem" } }}
+                          InputLabelProps={{ style: { fontSize: "1.6rem" } }}
+                          error={error?.password}
+                          helperText={error?.password}
+                          sx={{
+                            "& .MuiFormHelperText-root": {
+                              fontSize: "1rem",
                               fontWeight: "600",
-                            }}
-                          >
-                            {" "}
-                            {formatTime(Math.floor(seconds / 60))}:
-                            {formatTime(seconds % 60)}
-                          </Button>
-                        )}
+                              marginLeft: "0",
+                            },
+                          }}
+                        />
+                        <div className="password-reveal-icon">
+                          {RevealPassword === true && (
+                            <RemoveRedEyeOutlinedIcon
+                              sx={{ fontSize: "2rem", cursor: "pointer" }}
+                              onClick={() => {
+                                setRevealPassword(false);
+                              }}
+                            />
+                          )}
+                          {RevealPassword === false && (
+                            <VisibilityOffOutlinedIcon
+                              onClick={() => {
+                                setRevealPassword(true);
+                              }}
+                              sx={{ fontSize: "2rem", cursor: "pointer" }}
+                            />
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </Stack>
+                    </Stack>
+                  </div>
+                  <div className="forget-password mt-4 mb-4">
+                    <p
+                      onClick={() => {
+                        navigate("/login");
+                      }}
+                      style={{ textAlign: "end", cursor: "pointer" }}
+                    >
+                      Do you have an account?{""}{" "}
+                      <span style={{ color: "#04A56A", fontWeight: "600" }}>
+                        Login
+                      </span>
+                    </p>
+                  </div>
+                  <div className="sign-in-button">
+                    <LoadingButton
+                      loading={loading}
+                      onClick={() => {
+                        SubmitAllFunction();
+                      }}
+                      variant="contained"
+                      fullWidth
+                      color="success"
+                      sx={{
+                        bgcolor: "#04A56A",
+                        "&:hover": "#04A56A",
+                        fontSize: "1.5rem",
+                        textTransform: "none",
+                      }}
+                    >
+                      Creat My Account
+                    </LoadingButton>
+                  </div>
                 </div>
-                <div className="forget-password mt-4 mb-4">
-                  <p
-                    onClick={() => {
-                      navigate("/login");
-                    }}
-                    style={{ textAlign: "end", cursor: "pointer" }}
-                  >
-                    Do you have an account?{""}{" "}
-                    <span style={{ color: "#04A56A", fontWeight: "600" }}>
-                      Login
-                    </span>
-                  </p>
-                </div>
-                <div className="sign-in-button">
-                  <LoadingButton
-                    loading={loading}
-                    onClick={() => {
-                      fetchData();
-                    }}
-                    variant="contained"
-                    fullWidth
-                    color="success"
-                    sx={{
-                      bgcolor: "#04A56A",
-                      "&:hover": "#04A56A",
-                      fontSize: "1.5rem",
-                      textTransform: "none",
-                    }}
-                  >
-                    Creat My Account
-                  </LoadingButton>
-                </div>
-              </div>
-            </Container>
+              </Container>
+            </div>
+            <div
+              className="col-lg-5 col-md-12 col-sm-12 d-flex align-items-center justify-content-center"
+              style={{ backgroundColor: "#F7F8F9" }}
+            >
+              <img src={loginimg} alt="Login-img" className="img-fluid" />
+            </div>
           </div>
-          <div
-            className="col-lg-5 col-md-12 col-sm-12 d-flex align-items-center justify-content-center"
-            style={{ backgroundColor: "#F7F8F9" }}
-          >
-            <img src={loginimg} alt="Login-img" className="img-fluid" />
+
+          <div>
+            {/* <Button onClick={handleOpen}>Open modal</Button> */}
+            <Modal
+              aria-labelledby="spring-modal-title"
+              aria-describedby="spring-modal-description"
+              open={open}
+              onClose={handleClose}
+              closeAfterTransition
+              slots={{ backdrop: Backdrop }}
+              slotProps={{
+                backdrop: {
+                  TransitionComponent: Fade,
+                },
+              }}
+            >
+              <Fade in={open}>
+                <Box sx={style}>
+                  <div className="d-flex align-items-center justify-content-center">
+                    <h5>Register Successfully</h5>
+                    <img
+                      src={successIcon}
+                      alt="success-icon"
+                      className="img-fluid ms-2"
+                      style={{ width: "3.5rem" }}
+                    />
+                  </div>
+                  <Typography
+                    id="spring-modal-title"
+                    variant="h6"
+                    component="h2"
+                  ></Typography>
+                </Box>
+              </Fade>
+            </Modal>
           </div>
-        </div>
+        </form>
       </section>
     </>
   );
