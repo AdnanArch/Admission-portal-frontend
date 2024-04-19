@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import birdlogo from "../assets/bird-logo.svg";
 import loginimg from "../assets/loginimg.png";
 import {
