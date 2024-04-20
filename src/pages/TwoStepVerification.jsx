@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Paper } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { Axios } from "axios";
+import axios, { Axios } from "axios";
 import { LoadingButton } from "@mui/lab";
 
 function TwoStepVerification() {
@@ -51,24 +51,50 @@ function TwoStepVerification() {
   };
 
   // -------function for APi calling--------
+  // const fetchData = async () => {
+  //   setLoading(true);
+  //   const json = JSON.stringify(userInput);
+  //   console.log("JSON", json);
+  //   try {
+  //     const apiCall = {
+  //       url: "http://localhost:8088/signup/verification",
+  //       method: "POST",
+  //       data: json,
+  //     };
+  //     const apiResponse = await Axios(apiCall);
+  //     if (apiResponse.status === 200 || apiResponse.status === 201) {
+  //       setLoading(false);
+  //       navigate("/");
+  //     } else {
+  //       console.log("BAd");
+  //     }
+  //   } catch {}
+  // };
+
+  // -------function for API calling--------
   const fetchData = async () => {
     setLoading(true);
-    const json = JSON.parse(userInput);
-    console.log("JSON", json);
     try {
       const apiCall = {
-        url: "",
+        url: "http://localhost:8088/signup/verification",
         method: "POST",
-        data: json,
+        headers: {
+          "Content-Type": "application/json", // Specify the content type header
+        },
+        data: JSON.stringify({ token: userInput }), // Ensure data is a JSON object
       };
-      const apiResponse = await Axios(apiCall);
-      if (apiResponse.status === 200 || apiResponse.status === 201) {
-        setLoading(false);
+      const apiResponse = await axios(apiCall); // Make sure to use axios correctly
+      if (apiResponse.status === 201 || apiResponse.status === 202) {
+        console.log("Good");
         navigate("/");
       } else {
-        console.log("BAd");
+        console.log("Bad");
       }
-    } catch {}
+    } catch (error) {
+      console.error("Error: ", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const errorHandeling = (userInput) => {

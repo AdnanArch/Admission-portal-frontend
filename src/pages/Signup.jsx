@@ -77,7 +77,10 @@ function Signup() {
 
   // ----------use state for model----------
   const [open, setOpen] = React.useState(false);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    navigate("/signup/verification");
+  };
 
   // -------use-state for user input-------
   const [userinput, setUserinput] = useState({
@@ -115,7 +118,7 @@ function Signup() {
     setLoading(true);
     try {
       const apiCall = {
-        url: "http://localhost:8080/signup",
+        url: "http://localhost:8088/signup",
         method: "POST",
         data: userinput,
       };
@@ -123,7 +126,6 @@ function Signup() {
       if (apiResponse.status === 200 || apiResponse.status === 201) {
         setOpen(true);
         setLoading(false);
-        navigate("/signup/verification");
       } else {
         console.log("Very bad ustad g");
       }

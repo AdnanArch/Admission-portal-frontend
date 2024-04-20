@@ -75,7 +75,7 @@ function Login() {
   const FetchData = async () => {
     console.log("wahab");
     setLoading(true);
-    const apiUrl = admin ? "Admin url" : "Student url";
+    const apiUrl = admin ? "Admin url" : "http://localhost:8088/login";
     try {
       const ApiCall = {
         url: apiUrl,
