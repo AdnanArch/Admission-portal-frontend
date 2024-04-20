@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import birdlogo from "../assets/bird-logo.svg";
 import loginimg from "../assets/loginimg.png";
-import { Button, Container, Stack, TextField } from "@mui/material";
+import { Avatar, Button, Container, Stack, TextField } from "@mui/material";
 import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import { useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
 import axios from "axios";
+import { User } from "lucide-react";
 
 function Login() {
   const navigate = useNavigate();
@@ -18,7 +21,7 @@ function Login() {
   });
 
   // ---------se-state for error handeling--------
-  const [Error, setError] = useState({ email: "" });
+  const [Error, setError] = useState({ email: "", password: "" });
 
   // -------function for UserInput-Handeling--------
 
@@ -34,6 +37,9 @@ function Login() {
   // -------Use-stste for revel-password-------
   const [RevealPassword, setRevealPassword] = useState(false);
 
+  // --------use-state for Admin-login---------
+  const [admin, setAdmin] = useState(false);
+
   // ---------function for error handeling----------
 
   const ErrorHandeling = (UserInput) => {
@@ -41,25 +47,45 @@ function Login() {
     let ErrorMessage = {};
     let EmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (UserInput.email.length > 0 && !EmailPattern.test(UserInput.email)) {
-      ErrorMessage.email = " Please enter a valid E-mail addess";
+      ErrorMessage.email = "Please enter a valid E-mail addess";
+      return setError(ErrorMessage);
     }
-    setError(ErrorMessage);
+    setError("");
+  };
+
+  // ----function for chek inputs field data on submit-----
+
+  const ErrorOnSubmitForm = (userInput) => {
+    console.log(userInput.email);
+    let ErrorMessage = {};
+    let EmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!EmailPattern.test(userInput.email)) {
+      ErrorMessage.email = "Please enter E-mail addess";
+      return setError(ErrorMessage);
+    } else if (userInput.password.length < 1) {
+      console.log(userInput.password);
+      ErrorMessage.password = "Please enter password";
+      return setError(ErrorMessage);
+    }
+    setError("");
+    FetchData();
   };
 
   // ---------Axios function for Api calling---------
   const FetchData = async () => {
     console.log("wahab");
     setLoading(true);
+    const apiUrl = admin ? "Admin url" : "Student url";
     try {
       const ApiCall = {
-        url: "",
+        url: apiUrl,
         method: "POST",
         dats: UserInput,
       };
       const ApiResponse = await axios(ApiCall);
       if (ApiResponse.status === 200 || ApiResponse.status === 201) {
         setLoading(false);
-        console.log("Api call successfull");
+        navigate("/");
       } else {
         console.log("Api calling error");
         setLoading(false);
@@ -89,7 +115,7 @@ function Login() {
                   <Button
                     variant="outlined"
                     onClick={() => {
-                      navigate("/adminlogin");
+                      setAdmin(true);
                     }}
                     color="success"
                     size="medium"
@@ -106,10 +132,18 @@ function Login() {
               </div>
               <div className="login-content mx-auto" style={{ width: "35rem" }}>
                 <div className="login-head mb-5">
-                  <h5>Sign in</h5>
-                  <p>Are you Admin? </p>
+                  {admin === true && (
+                    <div className="d-flex justify-content-center mb-3">
+                      <Avatar sx={{ bgcolor: "#04A56A" }}>
+                        <User />
+                      </Avatar>
+                    </div>
+                  )}
+                  <h5 className="text-center">
+                    {admin ? "Admin login" : "Sign in"}
+                  </h5>
                 </div>
-                <div className="login-text-field mb-5">
+                <div className="login-text-field mb-3">
                   <Stack spacing={3}>
                     <TextField
                       onChange={InputHandeling}
@@ -127,6 +161,7 @@ function Login() {
                           fontSize: "1rem",
                           fontWeight: "600",
                           marginLeft: "0",
+                          marginTop: "1rem",
                         },
                       }}
                     />
@@ -142,10 +177,20 @@ function Login() {
                         color="success"
                         InputProps={{ style: { fontSize: "1.5rem" } }}
                         InputLabelProps={{ style: { fontSize: "1.6rem" } }}
+                        error={Error?.password}
+                        helperText={Error?.password}
+                        sx={{
+                          "& .MuiFormHelperText-root": {
+                            fontSize: "1rem",
+                            fontWeight: "600",
+                            marginLeft: "0",
+                            marginTop: "1rem",
+                          },
+                        }}
                       />
                       <div className="password-reveal-icon">
                         {RevealPassword === true && (
-                          <VisibilityIcon
+                          <RemoveRedEyeOutlinedIcon
                             sx={{ fontSize: "2rem", cursor: "pointer" }}
                             onClick={() => {
                               setRevealPassword(false);
@@ -153,7 +198,7 @@ function Login() {
                           />
                         )}
                         {RevealPassword === false && (
-                          <VisibilityOffRoundedIcon
+                          <VisibilityOffOutlinedIcon
                             onClick={() => {
                               setRevealPassword(true);
                             }}
@@ -162,12 +207,7 @@ function Login() {
                         )}
                       </div>
                     </div>
-                    <div className="forget-password mt-4">
-                      <p style={{ color: "#04A56A", textAlign: "end" }}>
-                        Forgot password?
-                      </p>
-                    </div>
-                    <p className="mt-0">
+                    <p>
                       Don&apos;t have an account at?{" "}
                       <span
                         style={{
@@ -182,13 +222,18 @@ function Login() {
                         Sign up
                       </span>
                     </p>
+                    <div className="forget-password mt-3">
+                      <p style={{ color: "#04A56A", textAlign: "end" }}>
+                        Forgot password?
+                      </p>
+                    </div>
                   </Stack>
                 </div>
 
                 <div className="sign-in-button">
                   <LoadingButton
                     onClick={() => {
-                      FetchData();
+                      ErrorOnSubmitForm(UserInput);
                     }}
                     loading={Loading}
                     variant="contained"

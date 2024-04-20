@@ -10,14 +10,14 @@ function TwoStepVerification() {
 
   // -------use state for use input-------
   const [userInput, setUserInput] = useState("");
-  // console.log(userInput);
+  console.log(userInput);
   const inputRefs = useRef([]);
 
   // ---------use state for loading---------
   const [loading, setLoading] = useState(false);
 
-  // -------use state for disable button--------
-  const [disable, setDisable] = useState(true);
+  // // -------use state for disable button--------
+  // const [disable, setDisable] = useState(true);
 
   // --------use state for error message--------
   const [errorMessage, setErrorMessage] = useState("");
@@ -53,16 +53,18 @@ function TwoStepVerification() {
   // -------function for APi calling--------
   const fetchData = async () => {
     setLoading(true);
+    const json = JSON.parse(userInput);
+    console.log("JSON", json);
     try {
       const apiCall = {
         url: "",
         method: "POST",
-        data: userInput,
+        data: json,
       };
       const apiResponse = await Axios(apiCall);
       if (apiResponse.status === 200 || apiResponse.status === 201) {
         setLoading(false);
-        console.log("Good");
+        navigate("/");
       } else {
         console.log("BAd");
       }
@@ -78,7 +80,6 @@ function TwoStepVerification() {
       setErrorMessage(ErrorMessage);
       return;
     } else if (userInput.length !== 6) {
-      console.log("six");
       ErrorMessage = "Please enter a six Numbers of code";
       setErrorMessage(ErrorMessage);
       return;
