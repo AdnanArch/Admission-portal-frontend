@@ -15,21 +15,37 @@ import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
-import PersonPinRoundedIcon from "@mui/icons-material/PersonPinRounded";
-import { Outlet, useNavigate } from "react-router-dom";
-import { blue } from "@mui/material/colors";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Avatar, Badge, Tooltip } from "@mui/material";
+import profile_img from "../assets/Dp.jpg";
+import { LayoutDashboard, University } from "lucide-react";
+import MarkEmailUnreadOutlinedIcon from "@mui/icons-material/MarkEmailUnreadOutlined";
+import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
+import { styled } from "@mui/material/styles";
+import uos_logo from "../assets/uos-logo.png";
 
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 function Sidenav(props) {
   const navigate = useNavigate();
   // --------state for active saide-nav button-----------
-  const [active, setActive] = React.useState(false);
+  const [activeItem, setActiveItem] = React.useState("");
 
-  const handleActive = () => {
-    setActive(!active);
+  const location = useLocation();
+
+  // --------function for navigate Dashboard---------
+  const Navigate = () => {
+    setActiveItem(location.pathname);
   };
+
+  React.useEffect(() => {
+    Navigate();
+  }, [navigate]);
+
+  const handleItemClick = (path) => {
+    setActiveItem(path);
+  };
+
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
@@ -49,44 +65,96 @@ function Sidenav(props) {
     }
   };
 
+  // -----------Appbar profile styling----------
+  const StyledBadge = styled(Badge)(({ theme }) => ({
+    "& .MuiBadge-badge": {
+      backgroundColor: "#44b700",
+      color: "#44b700",
+      boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+      "&::after": {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        borderRadius: "50%",
+        animation: "ripple 1.2s infinite ease-in-out",
+        border: "1px solid currentColor",
+        content: '""',
+      },
+    },
+    "@keyframes ripple": {
+      "0%": {
+        transform: "scale(.8)",
+        opacity: 1,
+      },
+      "100%": {
+        transform: "scale(2.4)",
+        opacity: 0,
+      },
+    },
+  }));
+
   const drawer = (
     <div>
-      <Toolbar />
-      <Divider />
+      <div className="profile d-flex align-items-center mb-3 mt-5">
+        <div className="profile-img">
+          <Avatar src={profile_img} />
+        </div>
+        <div className="profile-name ms-4">
+          <h6>Jameel Wahab</h6>
+        </div>
+      </div>
       <List>
         <ListItem>
           <ListItemButton
-            selected={active}
+            selected={activeItem === "/"}
             onClick={() => {
-              navigate("/dashboard");
-              handleActive();
+              handleItemClick("/");
+              navigate("/");
+            }}
+            sx={{
+              borderRadius: 1,
             }}
           >
             <ListItemIcon>
-              <DashboardRoundedIcon sx={{ fontSize: "2.5rem" }} />
+              <LayoutDashboard />
             </ListItemIcon>
-            <ListItemText
-              primary="Dashboard"
-              classes={{ primary: "customText" }}
-            />
+            <h6>Dashboard</h6>
           </ListItemButton>
         </ListItem>
 
         <ListItem>
           <ListItemButton
-            selected={active}
+            selected={activeItem === "/departments"}
             onClick={() => {
-              navigate("/customer");
-              handleActive();
+              handleItemClick("/departments");
+              navigate("/departments");
+            }}
+            sx={{ borderRadius: 1 }}
+          >
+            <ListItemIcon>
+              <University />
+            </ListItemIcon>
+            <h6>Departments</h6>
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem>
+          <ListItemButton
+            selected={activeItem === "/applications"}
+            onClick={() => {
+              handleItemClick("/applications");
+              navigate("/applications");
+            }}
+            sx={{
+              borderRadius: 1,
             }}
           >
             <ListItemIcon>
-              <PersonPinRoundedIcon sx={{ fontSize: "2.5rem" }} />
+              <MarkEmailUnreadOutlinedIcon sx={{ fontSize: "2.5rem" }} />
             </ListItemIcon>
-            <ListItemText
-              primary="Applications"
-              classes={{ primary: "customText" }}
-            />
+            <h6>Applications</h6>
           </ListItemButton>
         </ListItem>
       </List>
@@ -107,7 +175,6 @@ function Sidenav(props) {
     </div>
   );
 
-  // Remove this const when copying and pasting into your project.
   const container =
     window !== undefined ? () => window().document.body : undefined;
 
@@ -129,13 +196,58 @@ function Sidenav(props) {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: "none" } }}
+            sx={{ color: "black", mr: 2, display: { sm: "none" } }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" color="black">
-            Responsive drawer
-          </Typography>
+          <div className="flex-grow-1">
+            <img
+              onClick={() => {
+                navigate("/");
+              }}
+              src={uos_logo}
+              alt="Uos-logo"
+              className="img-fluid"
+              style={{ width: "6rem", objectFit: "contain", cursor: "pointer" }}
+            />
+          </div>
+          <div className="appbar-profile d-flex">
+            <div className="notification me-3">
+              <Tooltip
+                title={
+                  <span style={{ fontSize: "1.3rem", fontWeight: "600" }}>
+                    Notifications
+                  </span>
+                }
+              >
+                <IconButton>
+                  <Badge
+                    badgeContent={2}
+                    color="warning"
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        fontSize: "1.3rem",
+                        fontWeight: "600",
+                      },
+                    }}
+                  >
+                    <NotificationsNoneOutlinedIcon
+                      sx={{ color: "ActiveBorder", fontSize: "2.5rem" }}
+                    />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+            </div>
+            <div className="app-profile">
+              <StyledBadge
+                overlap="circular"
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                variant="dot"
+              >
+                <Avatar alt="Wahab" src={profile_img} />
+              </StyledBadge>
+            </div>
+          </div>
         </Toolbar>
       </AppBar>
       <Box

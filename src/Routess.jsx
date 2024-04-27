@@ -3,10 +3,11 @@ import { Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
-import Customer from "./pages/Customer";
+import Adddepartments from "./pages/Adddepartments";
 import Sidenav from "./pages/Sidenav";
 import Adminlogin from "./pages/Adminlogin";
 import TwoStepVerification from "./pages/TwoStepVerification";
+import Applications from "./pages/Applications";
 
 function Routess() {
   return (
@@ -18,7 +19,8 @@ function Routess() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<Sidenav />}>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/customer" element={<Customer />} />
+          <Route path="/departments" element={<Adddepartments />} />
+          <Route path="/applications" element={<Applications />} />
         </Route>
       </Routes>
     </>

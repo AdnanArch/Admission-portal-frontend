@@ -53,8 +53,8 @@ function TwoStepVerification() {
   // -------function for APi calling--------
   const fetchData = async () => {
     setLoading(true);
-    const json = JSON.parse(userInput);
-    console.log("JSON", json);
+    const json = JSON.stringify(userInput);
+    // console.log("JSON", json);
     try {
       const apiCall = {
         url: "",
