@@ -18,7 +18,6 @@ function Dashboard() {
         }}
       >
         <Toolbar />
-        {/* <h1 className="mb-5">Dashboard</h1> */}
         <section className="dash-board container mb-5">
           <div
             className="row py-5"

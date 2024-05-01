@@ -9,8 +9,10 @@
   --primery-text: #060640;
   --secondary-color: #00e5cc;
   --text-gray: #828297;
+  --text-L-gray: #637381;
   --text-black: #000000;
   --text-white: #ffffff;
+  --text-green: #04a56a;
 }
 
 body,
@@ -67,10 +69,10 @@ h5 {
 }
 
 h6 {
-  color: var(--bg-white);
-  font-size: 2rem;
-  font-weight: 600;
+  color: var(--text-L-gray);
+  font-size: 1.4rem;
   line-height: 1.2;
+  font-weight: 600;
 }
 
 p {
@@ -153,4 +155,34 @@ li a {
 }
 .two-step-verification .bottom-buttons .forgot-pass {
   color: #1976d2;
+}
+
+/*-----------Css for Side-nav---------*/
+.profile {
+  background-color: #edeff1;
+  padding: 1.3rem 2rem;
+  margin: 0 1.8rem;
+  border-radius: 0.5rem;
+}
+.profile .profile-name h6 {
+  color: #212b36;
+}
+.gradient-line {
+  margin: 0 0 50px 0;
+  display: block;
+  border: none;
+  height: 0.2rem !important;
+  width: 40rem;
+  background: var(--text-green);
+  background: linear-gradient(
+    to right,
+    white,
+    #04a56a,
+    #06f79e,
+    #04a56a,
+    white
+  );
+}
+.vh {
+  color: #06f79e;
 }

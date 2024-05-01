@@ -74,6 +74,11 @@ function TwoStepVerification() {
   // -------function for API calling--------
   const fetchData = async () => {
     setLoading(true);
+<<<<<<< HEAD
+=======
+    const json = JSON.stringify(userInput);
+    // console.log("JSON", json);
+>>>>>>> d7f35531829d1141b499d98f23562bba3166d6a7
     try {
       const apiCall = {
         url: "http://localhost:8088/signup/verification",

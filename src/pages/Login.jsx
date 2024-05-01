@@ -241,7 +241,9 @@ function Login() {
                     color="success"
                     sx={{
                       bgcolor: "#04A56A",
-                      "&:hover": "#04A56A",
+                      "&:hover": {
+                        bgcolor: "#047A4E",
+                      },
                       fontSize: "1.5rem",
                       textTransform: "none",
                     }}

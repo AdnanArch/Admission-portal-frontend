@@ -171,7 +171,7 @@ function Signup() {
     setError("");
   };
 
-  // -------function for error chrk on submit-------
+  // -------function for error chack on submit-------
   const ErrorOnSubmitForm = (userinput) => {
     console.log("wahab");
     console.log(userinput.firstName);
@@ -379,7 +379,9 @@ function Signup() {
                       color="success"
                       sx={{
                         bgcolor: "#04A56A",
-                        "&:hover": "#04A56A",
+                        "&:hover": {
+                          bgcolor: "#047A4E",
+                        },
                         fontSize: "1.5rem",
                         textTransform: "none",
                       }}
